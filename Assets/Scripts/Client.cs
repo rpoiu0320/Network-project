@@ -19,11 +19,6 @@ public class Client : MonoBehaviour
         DisConnect();
     }
 
-    private void Start()
-    {
-        Connect();
-    }
-
     private void Update()
     {
         if (IsConnected && stream.DataAvailable)    // NetworkStream.DataAvailable 데이터를 읽을 수 있는지 여부

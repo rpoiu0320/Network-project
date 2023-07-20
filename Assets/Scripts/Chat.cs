@@ -7,6 +7,8 @@ public class Chat : MonoBehaviour
 {
     public static Chat instance { get; private set; }
 
+    [SerializeField] Client client;
+
     public InputField inputField;
     public RectTransform ChatContent;
     public Text ChatText;
@@ -15,7 +17,9 @@ public class Chat : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        inputField.onSubmit.AddListener(AddMessage);
+        //inputField.onSubmit.AddListener(AddMessage);
+        //inputField.onSubmit.AddListener((str) => { client.SendChat(str); });
+        inputField.onSubmit.AddListener(client.SendChat);
     }
 
     public void AddMessage(string data)
