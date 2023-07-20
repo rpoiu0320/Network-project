@@ -10,8 +10,10 @@ public class Server : MonoBehaviour
 {
     TcpListener listener;
     List<TcpClient> connectedClients;
+    List<TcpClient> disConnectedClients;
 
     public bool IsOpened { get; private set; } = false;
+
 
     private void Update()
     {
@@ -20,6 +22,13 @@ public class Server : MonoBehaviour
 
         foreach (TcpClient client in connectedClients)
         {
+            if (!ClientConnectCheck(client))            // 접속 여부 확인
+            {
+                client?.Close();
+                disConnectedClients.Add(client);
+                continue;
+            }
+
             NetworkStream stream = client.GetStream();
             
             if (stream.DataAvailable)
@@ -30,6 +39,13 @@ public class Server : MonoBehaviour
                 SendAll(chat);
             }
         }
+
+        foreach (TcpClient client in disConnectedClients)
+        {
+            connectedClients.Remove(client);
+        }
+
+        disConnectedClients.Clear();
     }
 
     private void OnDisable()
@@ -43,9 +59,11 @@ public class Server : MonoBehaviour
             return;
 
         connectedClients = new List<TcpClient>();
+        disConnectedClients = new List<TcpClient>();
 
         try
         {   // 서버 열기 성공
+            Debug.Log("서버 열기 성공");
             listener = new TcpListener(IPAddress.Any, 7777);
             listener.Start();
             IsOpened = true;
@@ -67,6 +85,39 @@ public class Server : MonoBehaviour
         listener = null;
         IsOpened = false;
         Debug.Log("서버 닫음");
+    }
+
+    public bool ClientConnectCheck(TcpClient client)
+    {
+        try
+        {
+            if (client != null && client.Client != null && client.Connected)
+            {
+                if (client.Client.Poll(0, SelectMode.SelectRead))
+                {
+                    if (client.Client.Poll(0, SelectMode.SelectRead))
+                        return !(client.Client.Receive(new byte[1], SocketFlags.Peek) == 0);
+
+                    return true;
+                }
+                else
+                {
+                    Debug.Log("클라이언트 무반응 확인2");
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Log("클라이언트 무반응 확인1");
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("클라이언트 접속 확인 실패");
+            CloseServer();
+            return false;
+        }
     }
 
     public void SendAll(string chat)

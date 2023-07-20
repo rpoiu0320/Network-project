@@ -32,7 +32,8 @@ public class Client : MonoBehaviour
 
         try
         {   // 접속 성공
-            client = new TcpClient("127.0.0.1", 7777);      // 127.0.0.1 == localhost, 자가회신
+            //client = new TcpClient("127.0.0.1", 7777);      // 127.0.0.1 == localhost, 자가회신
+            client = new TcpClient("192.168.0.112", 7777);
             stream = client.GetStream();
             writer = new StreamWriter(stream);
             reader = new StreamReader(stream);
@@ -58,6 +59,7 @@ public class Client : MonoBehaviour
         client?.Close();
         client = null;
         IsConnected = false;
+        Debug.Log("접속 끊기 성공");
     }
 
     public void SendChat(string chat)
@@ -81,6 +83,7 @@ public class Client : MonoBehaviour
                                                     //_charBuffer를 클리어 하진 않는다.
                                                     //_charPos의 역할은 메모장 내 커서와 같다.
                                                     //_charPos가 가리키는 버퍼 위치에서부터 데이터가 채워지기 때문이다.
+            Debug.Log($"클라이언트가 {chat}을 서버로 전송");
         }
         catch (Exception e)
         {   // 송신 실패
@@ -98,6 +101,7 @@ public class Client : MonoBehaviour
         {   // 수신 성공
             string chat = reader.ReadLine();
             Chat.instance.AddMessage(chat);
+            Debug.Log($"클라이언트가 {chat}을 서버로부터 받음");
         }
         catch (Exception e)
         {   // 수신 실패
