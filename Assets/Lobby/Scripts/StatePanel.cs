@@ -20,8 +20,8 @@ public class StatePanel : MonoBehaviour
             return;
 
         state =  PhotonNetwork.NetworkClientState;
-        Debug.Log($"[Photon] {state}");
+        Debug.Log(string.Format("[Photon NetworkState] {0}", state.ToString()));
         TMP_Text text = Instantiate(textPrefab, content);
-        text.text = string.Format($"[Photon] {0} : {1}", System.DateTime.Now.ToString("HH:mm:ss.ff"), state);
+        text.text = string.Format("[Photon] {0} : {1}", System.DateTime.Now.ToString("HH:mm:ss.ff"), state.ToString());
     }
 }
